@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
 
 namespace ConsoleAppReflection
 {
@@ -16,7 +18,6 @@ namespace ConsoleAppReflection
             PrintFields(fields);
 
             Console.WriteLine();
-
             Console.WriteLine("\t\t\t Methods \t\t\t");
             PrintMethods(methods);
 
@@ -28,22 +29,17 @@ namespace ConsoleAppReflection
         {
             foreach (FieldInfo field in fields)
             {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write(field.FieldType.Name);
-                Console.ForegroundColor = ConsoleColor.Gray;
-
-                Console.Write(" ");
-                Console.Write(field.Name);
-
-                Console.Write(" = ");
-
+                // field type
+                Print(field.FieldType.Name, ConsoleColor.Blue);
+                
+                // field name
+                Console.Write($" {field.Name} = ");
+                
+                // field value
                 var value = field.GetValue(field.Name);
                 if (value is string)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write('\"');
-                    Console.Write(value);
-                    Console.Write('\"');
+                    Print($"\"{value}\"", ConsoleColor.Red);
                 }
                 else
                 {
@@ -51,7 +47,6 @@ namespace ConsoleAppReflection
                 }
 
                 Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Gray;
             }
         }
 
@@ -59,33 +54,27 @@ namespace ConsoleAppReflection
         {
             foreach (var method in methods)
             {
-                // return type
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write(method.ReturnType.Name);
-                Console.ForegroundColor = ConsoleColor.Gray;
-
+                // method return type
+                Print(method.ReturnType.Name, ConsoleColor.Blue);
                 Console.Write(" ");
-
+                
                 // method name
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(method.Name);
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Print(method.Name, ConsoleColor.Yellow);
 
-                // args
+                // method args
                 var methodParameters = method.GetParameters(); ;
                 Console.Write("(");
                 for (int i = 0; i < methodParameters.Length; i++)
                 {
                     var methodParameter = methodParameters[i];
+                    
+                    // method arg type
                     Console.Write(methodParameter.ParameterType.Name);
                     Console.Write(" ");
 
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write(methodParameter.Name);
+                    // method arg name
+                    Print(methodParameter.Name, ConsoleColor.Cyan);
 
-                    Console.ForegroundColor = ConsoleColor.Gray;
-
-                    // add ',' if arg is not last
                     if (i != methodParameters.Length - 1)
                     {
                         Console.Write(", ");
@@ -95,6 +84,13 @@ namespace ConsoleAppReflection
                 Console.WriteLine(")");
             }
 
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+        private static void Print(string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(text);
             Console.ForegroundColor = ConsoleColor.Gray;
         }
     }
