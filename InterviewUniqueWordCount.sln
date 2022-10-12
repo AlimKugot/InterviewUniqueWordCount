@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterviewUniqueWordCount", "InterviewUniqueWordCount\InterviewUniqueWordCount.csproj", "{6C5A87BA-5CCB-4DFF-BC32-1F200C696913}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InterviewUniqueWordCount", "InterviewUniqueWordCount\InterviewUniqueWordCount.csproj", "{6C5A87BA-5CCB-4DFF-BC32-1F200C696913}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionConsoleApp", "ReflectionConsoleApp\ReflectionConsoleApp.csproj", "{45895998-7FE4-41A7-8647-667E0748F434}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6C5A87BA-5CCB-4DFF-BC32-1F200C696913}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C5A87BA-5CCB-4DFF-BC32-1F200C696913}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C5A87BA-5CCB-4DFF-BC32-1F200C696913}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45895998-7FE4-41A7-8647-667E0748F434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45895998-7FE4-41A7-8647-667E0748F434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45895998-7FE4-41A7-8647-667E0748F434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45895998-7FE4-41A7-8647-667E0748F434}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
