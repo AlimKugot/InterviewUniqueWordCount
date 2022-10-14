@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Xml;
 using System.Xml.Linq;
 using InterviewUniqueWordCount.utils;
 
@@ -42,6 +44,14 @@ namespace InterviewUniqueWordCount
             XmlNodeList paragraphList = FbUtility.ParseParagraphsToList(filePath);
             Dictionary<string, long> res = FbUtility.CountUniqueWords(paragraphList);
             Dictionary<string, long> ordered = res.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+            return ordered;
+        }
+
+        public static Dictionary<string, long> ParseParallel(string filePath)
+        {
+            XmlNodeList paragraphList = FbUtility.ParseParagraphsToList(filePath);
+            var res = FbUtility.CountUniqueWordsParallel(paragraphList);
+            var ordered = res.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
             return ordered;
         }
 
