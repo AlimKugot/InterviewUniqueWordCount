@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Collections.Concurrent;
+using System.Xml;
 using System.Xml.Linq;
 using InterviewUniqueWordCount.utils;
 
@@ -39,13 +40,26 @@ namespace InterviewUniqueWordCount
 
         private static Dictionary<string, long> Parse(string filePath)
         {
-            XmlNodeList paragraphList = FbUtility.ParseParagraphsToList(filePath);
-            Dictionary<string, long> res = FbUtility.CountUniqueWords(paragraphList);
+            List<string> words = FbUtility.ParseParagraphsToList(filePath);
+            Dictionary<string, long> res = FbUtility.CountUniqueWords(words);
             Dictionary<string, long> ordered = res.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
             return ordered;
         }
 
-        private static void PrintToFile(string outputFilePath, Dictionary<string, long> wordCount)
+        public static Dictionary<string, long> ParseParallel(string filePath)
+        {
+            List<string> words = FbUtility.ParseParagraphsToList(filePath);
+            ConcurrentBag<string> wordsConcurrent = new(words);
+            
+            ConcurrentDictionary<string, long> resConcurrent = FbUtility.CountUniqueWordsParallel(wordsConcurrent);
+            Dictionary<string, long> res = resConcurrent.ToDictionary(e => e.Key, e => e.Value);
+            
+            Dictionary<string, long> ordered = res.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+            return ordered;
+        }
+
+
+        private static void PrintToFile(string outputFilePath, IDictionary<string, long> wordCount)
         {
             using (StreamWriter writer = new(outputFilePath))
             {

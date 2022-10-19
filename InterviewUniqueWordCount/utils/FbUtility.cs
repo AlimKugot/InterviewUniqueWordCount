@@ -1,12 +1,15 @@
-﻿using System.Xml;
+﻿using System.Collections.Concurrent;
+using System.Xml;
 
 namespace InterviewUniqueWordCount.utils
 {
     public class FbUtility
     {
+        private static readonly char[] separators = new char[] { ' ', '\r', '\n', '\t', ',', '.', ';', '!', '?', '-', '(', ')', '\"' };
+
         private FbUtility() { }
 
-        public static XmlNodeList ParseParagraphsToList(string filePath)
+        public static List<string> ParseParagraphsToList(string filePath)
         {
             XmlDocument xmlDocument = new();
             xmlDocument.Load(filePath);
@@ -25,28 +28,48 @@ namespace InterviewUniqueWordCount.utils
                 );
             }
 
-            return pNodeList;
-        }
-
-        public static Dictionary<string, long> CountUniqueWords(XmlNodeList nodeList)
-        {
-            Dictionary<string, long> uniqueWordsWithCount = new Dictionary<string, long>();
-            char[] separators = new char[] { ' ', '\r', '\n', '\t', ',', '.', ';', '!', '?', '-', '(', ')', '\"'};
-
-            foreach (XmlNode p in nodeList)
+            List<string> words = new(pNodeList.Count);
+            
+            foreach (XmlNode p in pNodeList)
             {
                 string line = p.InnerText.ToLower();
                 string[] separatedLine = line.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string s in separatedLine)
                 {
-                    if (uniqueWordsWithCount.ContainsKey(s))
-                    {
-                        uniqueWordsWithCount[s]++;
-                    }
-                    else
-                    {
-                        uniqueWordsWithCount[s] = 1;
-                    }
+                    words.Add(s);
+                }
+            }
+            
+            return words;
+        }
+
+
+        public static ConcurrentDictionary<string, long> CountUniqueWordsParallel(ConcurrentBag<string> words)
+        {
+            ConcurrentDictionary<string, long> uniqueWordsWithCount = new();
+
+            Parallel.ForEach(words, word =>
+            {
+                uniqueWordsWithCount.AddOrUpdate(word, 1, (key, current) => current + 1);
+            });
+
+            return uniqueWordsWithCount;
+        }
+
+
+        public static Dictionary<string, long> CountUniqueWords(List<string> words)
+        {
+            Dictionary<string, long> uniqueWordsWithCount = new Dictionary<string, long>();
+
+            foreach (string s in words)
+            {
+                if (uniqueWordsWithCount.ContainsKey(s))
+                {
+                    uniqueWordsWithCount[s]++;
+                }
+                else
+                {
+                    uniqueWordsWithCount[s] = 1;
                 }
             }
 
