@@ -51,10 +51,6 @@ namespace InterviewUniqueWordCount.utils
             Parallel.ForEach(words, word =>
             {
                 uniqueWordsWithCount.AddOrUpdate(word, 1, (key, current) => current + 1);
-                //if (!uniqueWordsWithCount.TryAdd(word, 1))
-                //{
-                //    uniqueWordsWithCount[word]++;
-                //}
             });
 
             return uniqueWordsWithCount;
