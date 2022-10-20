@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Xml;
 
-namespace InterviewUniqueWordCount.utils
+namespace InterviewUniqueWordCount
 {
     public class FbUtility
     {
@@ -9,12 +9,23 @@ namespace InterviewUniqueWordCount.utils
 
         private FbUtility() { }
 
-        public static List<string> ParseParagraphsToList(string filePath)
+        public static List<string> ParseXmlString(string xml)
         {
-            XmlDocument xmlDocument = new();
-            xmlDocument.Load(filePath);
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xml);
+            return ExtractFromXmlWords(xmlDocument);
+        }
 
-            XmlNodeList? pNodeList = xmlDocument.SelectNodes("" +
+        public static List<string> ParseXmlFile(string filePath)
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.Load(filePath);
+            return ExtractFromXmlWords(xmlDocument);
+        }
+
+        private static List<string> ExtractFromXmlWords(XmlDocument xmlDocument)
+        {
+            XmlNodeList pNodeList = xmlDocument.SelectNodes("" +
                 "/*[local-name() = 'FictionBook']" +
                 "/*[local-name() = 'body']" +
                 "/*[local-name() = 'section']" +
@@ -28,8 +39,8 @@ namespace InterviewUniqueWordCount.utils
                 );
             }
 
-            List<string> words = new(pNodeList.Count);
-            
+            List<string> words = new List<string>(pNodeList.Count);
+
             foreach (XmlNode p in pNodeList)
             {
                 string line = p.InnerText.ToLower();
@@ -39,21 +50,23 @@ namespace InterviewUniqueWordCount.utils
                     words.Add(s);
                 }
             }
-            
+
             return words;
         }
 
 
-        public static ConcurrentDictionary<string, long> CountUniqueWordsParallel(ConcurrentBag<string> words)
+        public static Dictionary<string, long> CountUniqueWordsParallel(ConcurrentBag<string> words)
         {
-            ConcurrentDictionary<string, long> uniqueWordsWithCount = new();
+            ConcurrentDictionary<string, long> uniqueWordsWithCount = new ConcurrentDictionary<string, long>();
 
             Parallel.ForEach(words, word =>
             {
                 uniqueWordsWithCount.AddOrUpdate(word, 1, (key, current) => current + 1);
             });
 
-            return uniqueWordsWithCount;
+            Dictionary<string, long> dict= uniqueWordsWithCount.ToDictionary(e => e.Key, e => e.Value);
+            Dictionary<string, long> ordered = dict.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+            return ordered;
         }
 
 
@@ -72,8 +85,8 @@ namespace InterviewUniqueWordCount.utils
                     uniqueWordsWithCount[s] = 1;
                 }
             }
-
-            return uniqueWordsWithCount;
+            var ordered = uniqueWordsWithCount.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+            return ordered;
         }
     }
 }

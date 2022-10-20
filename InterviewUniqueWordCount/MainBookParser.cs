@@ -1,14 +1,11 @@
 ﻿using System.Collections.Concurrent;
-using System.Xml;
-using System.Xml.Linq;
-using InterviewUniqueWordCount.utils;
 
 namespace InterviewUniqueWordCount
 {
     public class MainBookParser
     {
 
-        private static readonly string PROJECT_ROOT_PATH = FileUtility.DirectoryLevelUp(3);
+        private static readonly string PROJECT_ROOT_PATH = Files.FileUtility.DirectoryLevelUp(3);
 
         private static readonly string DEFAULT_INPUT_FILE_NAME = "gjugo_1861_miserables.fb2";
         private static readonly string DEFAULT_INPUT_FILE_PATH = PROJECT_ROOT_PATH + "\\" + DEFAULT_INPUT_FILE_NAME;
@@ -24,12 +21,12 @@ namespace InterviewUniqueWordCount
                 case 0:
                     Console.WriteLine("Starting parsing default file: " + DEFAULT_INPUT_FILE_PATH);
                     Dictionary<string, long> result = Parse(DEFAULT_INPUT_FILE_PATH);
-                    PrintToFile(OUTPUT_FILE_PATH, result);
+                    Files.FileUtility.PrintToFile(OUTPUT_FILE_PATH, result);
                     break;
                 case 1:
                     Console.WriteLine("Starting parsing: " + args[0]);
                     Dictionary<string, long> resultWithArg = Parse(args[0]);
-                    PrintToFile(OUTPUT_FILE_PATH, resultWithArg);
+                    Files.FileUtility.PrintToFile(OUTPUT_FILE_PATH, resultWithArg);
                     break;
                 default:
                     Console.WriteLine("Error: too much arguments. Please enter file path to your txt file");
@@ -40,34 +37,17 @@ namespace InterviewUniqueWordCount
 
         private static Dictionary<string, long> Parse(string filePath)
         {
-            List<string> words = FbUtility.ParseParagraphsToList(filePath);
+            List<string> words = FbUtility.ParseXmlFile(filePath);
             Dictionary<string, long> res = FbUtility.CountUniqueWords(words);
-            Dictionary<string, long> ordered = res.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-            return ordered;
+            return res;
         }
 
         public static Dictionary<string, long> ParseParallel(string filePath)
         {
-            List<string> words = FbUtility.ParseParagraphsToList(filePath);
-            ConcurrentBag<string> wordsConcurrent = new(words);
-            
-            ConcurrentDictionary<string, long> resConcurrent = FbUtility.CountUniqueWordsParallel(wordsConcurrent);
-            Dictionary<string, long> res = resConcurrent.ToDictionary(e => e.Key, e => e.Value);
-            
-            Dictionary<string, long> ordered = res.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-            return ordered;
-        }
+            List<string> words = FbUtility.ParseXmlFile(filePath);
+            ConcurrentBag<string> wordsConcurrent = new ConcurrentBag<string>(words);
 
-
-        private static void PrintToFile(string outputFilePath, IDictionary<string, long> wordCount)
-        {
-            using (StreamWriter writer = new(outputFilePath))
-            {
-                foreach (KeyValuePair<string, long> kvp in wordCount)
-                {
-                    writer.WriteLine(kvp.Key + " " + kvp.Value);
-                }
-            }
+            return FbUtility.CountUniqueWordsParallel(wordsConcurrent);
         }
     }
 }
