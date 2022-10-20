@@ -1,4 +1,4 @@
-﻿namespace InterviewUniqueWordCount.utils
+﻿namespace Files
 {
     public class FileUtility
     {
@@ -21,6 +21,17 @@
             }
 
             return currentDirectory.FullName;
+        }
+
+        public static void PrintToFile(string outputFilePath, IDictionary<string, long> wordCount)
+        {
+            using (StreamWriter writer = new StreamWriter(outputFilePath))
+            {
+                foreach (KeyValuePair<string, long> kvp in wordCount)
+                {
+                    writer.WriteLine(kvp.Key + " " + kvp.Value);
+                }
+            }
         }
     }
 }
